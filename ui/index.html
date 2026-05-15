@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elden Companion</title>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+ <!--Main Menu-->
+    <div class="screen active" id="menu"> 
+        <h1>Elden Companion</h1>
+        <button onclick="go('setup2')">Start a New Journey</button>
+        <button onclick="return_session()">Continue</button>
+        <button onclick="go('apisettings')">API Settings</button>
+        <button onclick="go('options')">Options</button>
+        <button id="quit">Quit </button>
+    </div>
+ <!--Set-Up 2-->  
+    <div style="text-align: left;" class="screen" id='setup2'>
+        <p>Greetings, Tarnished… Together we tread the Lands Between. Before our first step, unburden thy hopes and designs.</p>
+        <div style="display: flex; flex-direction: row; gap: 200px;">
+            <button onclick="go('menu')">Back</button> 
+            <button onclick="go('setup3')">Next</button>
+        </div>  
+    </div>
+ <!--Set-Up 3-->  
+    <div style="text-align: left;" class="screen" id='setup3'>
+        <p>Do you want to follow a build during this session?</p>
+        <a href="https://yourfavbuildpage.com" target="_blank" class="elden-link-box"> Tarnished Codex</a>
+        
+        <label for="buildinput">Choose:</label>
+            <input
+                onclick="act_bld()"
+                onchange="send_build1()"
+                class="elden-input"
+                id="buildinput"
+                list="buildoptions"
+                placeholder="Start typing a build name"
+                autocomplete="off"
+            />
+        <datalist id="buildoptions"></datalist>
+        <div style="display: flex; flex-direction: row; gap: 200px;">
+            <button onclick="go('setup2')">Back</button>
+            <button onclick="go('setup4')">Next</button>
+        </div>
+    </div>
+<!--Set-Up 4--> 
+    <div style="text-align: left;" class="screen" id='setup4'>
+        <p>How would you like to view the help?</p>
+            <select onchange="walktrgh1()" class="elden-input" id="helpchoice">
+                <option value="">-- Select --</option>
+                <option >Minimalistic</option>
+                <option >Full Walktrough</option>
+            </select>
+        <div style="display: flex; flex-direction: row; gap: 200px;">
+            <button onclick="go('setup3')">Back</button>
+            <button onclick="go('setup5')">Next</button>
+        </div>
+    </div>
+<!--Set-Up 5-->  
+    <div style="text-align: left;" class="screen" id='setup5'>
+        <p>Before, we start...</p>
+        <p>Now that you are outside <span style="color: #C9A227;">the Stranded Graveyard</span>, remember this: <span style="color: #aa0000;">the Tree Sentinel</span> is not your fight. Not yet.</p>
+        <div style="display: flex; flex-direction: row; gap: 200px;"> 
+            <button onclick="go('menu')">Home</button>
+            <button onclick="gomain('insession');save();">Begin</button>
+        </div>
+    </div>
+<!--Main Screen-->  
+    <div class="screen" id='insession'>
+
+        <!-- Left Panel: Window Buttons -->
+        <div class="leftpanel">
+         <button class="lbutton" id="regionlist" onclick="openwin('regionWindow')">Regions</button>
+         <button class="lbutton" id="infoBtn" onclick="openwin('buildWindow')">Build</button>
+         <button class="lbutton" id="notepad" onclick="openwin('notepadWindow')">Notepad</button>
+         <button class="lbutton" id="API" onclick="openwin('apiWindow')">Companion</button>
+         <button class="lbutton hidden" id="walktrough" onclick="openwin('walktroughWindow')">Walktrough</button>
+         <button style="display: inline-block;" onclick="save(); openwin('levelqry');" id="save">Save</button>
+         <button style="display: inline-block;" onclick="save(); goback('menu');" id="home">Home</button>
+        </div>
+        <!-- Windows: Save -->
+         <div class="app_window hidden" id="levelqry"> 
+            <div style="text-align: right;" class="window_header"> 
+                <button class="lbutton" onclick="closewin('levelqry')"> — </button>
+            </div>
+            <label>What is your current level?</label>
+            <div style="display: flex; flex-direction: row; gap: 3px;">
+                <input class="elden-input" id="lvl" placeholder="Enter your level">
+                <button onclick="get_lvl();save();closewin('levelqry');">➜</button>
+            </div>
+            
+        </div>
+        <!-- Windows: Region -->
+         <div class="app_window hidden" id="regionWindow"> 
+            <div style="text-align: right;" class="window_header"> 
+                <button class="lbutton" onclick="closewin('regionWindow')"> — </button>
+            </div>
+            <div style="text-align: center;" class="window_header"> 
+                <h3>List of Regions</h3>
+                <a href="https://yourfavguide.com" target="_blank" class="elden-link-box"> Map fragment</a>
+            </div>
+            <div style="height: 80%; width: 300px; overflow-y: auto;" class="window_body" > 
+                <ul style="text-align: left;display: flex;flex-direction: column;" class="scroll_list">
+                    <li onclick="switchregion('West Limgrave')" class="lbutton">West Limgrave</li>
+                    <li onclick="switchregion('East Limgrave')" class="lbutton">East Limgrave</li>
+                    <li onclick="switchregion('Southern Limgrave & Weeping Peninsula')" class="lbutton">Southern Limgrave & Weeping Peninsula</li>
+                    <li onclick="switchregion('Roundtable Hold')" class="lbutton">Roundtable Hold</li>
+                    <li onclick="switchregion('Stormveil Castle')" class="lbutton">Stormveil Castle</li>
+                    <li onclick="switchregion('Liurnia of the Lakes South')" class="lbutton">Liurnia of the Lakes South</li>
+                    <li onclick="switchregion('Raya Lucaria Academy')" class="lbutton">Raya Lucaria Academy</li>
+                    <li onclick="switchregion('Liurnia of the Lakes East')" class="lbutton">Liurnia of the Lakes East</li>
+                    <li onclick="switchregion('Ainsel River')" class="lbutton">Ainsel River (Underground)</li>
+                    <li onclick="switchregion('Liurnia of the Lakes West')" class="lbutton">Liurnia of the Lakes West</li>
+                    <li onclick="switchregion('Siofra River')" class="lbutton">Siofra River (Underground)</li>
+                    <li onclick="switchregion('Caelid')" class="lbutton">Caelid (South)</li>
+                    <li onclick="switchregion('Nokron, Eternal City & Siofra Aqueduct')" class="lbutton">Nokron, Eternal City & Siofra Aqueduct</li>
+                    <li onclick="switchregion('Liurnia of the Lakes West-2')" class="lbutton">Liurnia of the Lakes West</li>
+                    <li onclick="switchregion('Deeproot Depths')" class="lbutton">Deeproot Depths</li>
+                    <li onclick="switchregion('Nokstella, Eternal City & Lake of Rot')" class="lbutton">Nokstella, Eternal City & Lake of Rot</li>
+                    <li onclick="switchregion('Altus Plateau')" class="lbutton">Altus Plateau</li>
+                    <li onclick="switchregion('Mt Gelmir')" class="lbutton">Mt Gelmir</li>
+                    <li onclick="switchregion('Leyndell, Royal Capital Outskirts')" class="lbutton">Leyndell, Royal Capital Outskirts</li>
+                    <li onclick="switchregion('Forbidden Lands')" class="lbutton">Forbidden Lands</li>
+                    <li onclick="switchregion('Mountaintops of the Giants')" class="lbutton">Mountaintops of the Giants</li>
+                    <li onclick="switchregion('Consecrated Snowfield')" class="lbutton">Consecrated Snowfield</li>
+                    <li onclick="switchregion('Mohgwyn Palace')" class="lbutton">Mohgwyn Palace</li>
+                    <li onclick="switchregion('Miquellas Haligtree')" class="lbutton">Miquella's Haligtree</li>
+                    <li onclick="switchregion('Crumbling Farum Azula')" class="lbutton">Crumbling Farum Azula</li>
+                    <li onclick="switchregion('Leyndell, Ashen Capital')" class="lbutton">Leyndell, Ashen Capital</li>
+                    <li onclick="switchregion('Subterranean Shunning-Grounds')" class="lbutton">Subterranean Shunning-Grounds</li>
+                    <li onclick="switchregion('Endings')" class="lbutton">Endings</li>
+                </ul>
+            </div>
+         </div>
+        <!-- Windows: Build -->
+        <div class="app_window hidden" style="max-width: 280; min-width: 279px; max-height: 650px;" id="buildWindow"> 
+            <div style="text-align: right;" class="window_header"> 
+                <button class="lbutton" onclick="closewin('buildWindow')"> — </button>
+            </div>
+        </div>
+        <!-- Windows: Notepad -->
+        <div class="app_window hidden" id="notepadWindow"> 
+            <div style="text-align: right;" class="window_header"> 
+                <button class="lbutton" onclick="closewin('notepadWindow');window.pywebview.api.save_notes();"> — </button>
+            </div>
+            <div style="text-align: center;" class="window_header"> 
+                <h3>Field Notes</h3>
+            </div>
+            <div class="editor-box" style="text-align: left; height: 200px; overflow-y: auto;">   
+                <textarea id="notes" class="elden-textarea" spellcheck="false" style="box-sizing: border-box; width: 100%;height: 95%; resize: both;" placeholder="Write, Tarnished..."> </textarea>
+            </div>
+        </div>
+        <!-- Windows: Agent -->
+        <div class="app_window hidden" id="apiWindow"> 
+            <div style="text-align: right;" class="window_header"> 
+                <button class="lbutton" onclick="closewin('apiWindow')"> — </button>
+            </div>
+            <div style="text-align: center;" class="window_header"> 
+                <h3>Companion</h3>
+            </div>
+            <div class="elden-chat">
+                <div style="text-align: left;" class="chat-messages" id="chatMessages">
+
+                </div>
+
+                <div style="text-align: right; overflow-y: auto;" class="chat-input-area">   
+                    <input spellcheck="false" type="text" id="chatInput" placeholder="Speak, Tarnished...">
+                    <button class="lbutton" onclick="sendMessage()">Ask</button>
+                </div>
+            </div>
+        </div>
+        <!-- Window: Walktrough -->
+        <div style="resize: both;" class="app_window hidden" id="walktroughWindow"> 
+            <div style="text-align: right;" class="window_header"> 
+                <button class="lbutton" onclick="closewin('walktroughWindow')"> — </button>
+            </div>
+            <div style="text-align: center;" class="window_header"> 
+                <h3>Walktrough</h3>
+            </div>
+            <div style="text-align: left; overflow-y: auto;box-sizing: border-box; max-width: 300px; min-width: 299px" class="walktrgh_content active">
+                <p id="West Limgrave wlk">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+            </div>
+            <div style="text-align: left; overflow-y: auto;box-sizing: border-box; max-width: 300px; min-width: 299px" class="walktrgh_content">
+                <p id="East Limgrave wlk"> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>            </div>
+            <div style="text-align: left; overflow-y: auto;box-sizing: border-box; max-width: 300px; min-width: 299px" class="walktrgh_content">
+                <p id='Southern Limgrave &amp; Weeping Peninsula wlk'> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>            </div>
+            <div style="text-align: left; overflow-y: auto;box-sizing: border-box; max-width: 300px; min-width: 299px" class="walktrgh_content">
+                <p id='Roundtable Hold wlk'> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>            </div>
+            <div style="text-align: left; overflow-y: auto;box-sizing: border-box; max-width: 300px; min-width: 299px" class="walktrgh_content">
+                <p id='Stormveil Castle wlk'> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>              </div>
+            <div style="text-align: left; overflow-y: auto;box-sizing: border-box; max-width: 300px; min-width: 299px" class="walktrgh_content">
+                <p id='Liurnia of the Lakes South wlk'>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>            </div>
+            <div style="text-align: left; overflow-y: auto;box-sizing: border-box; max-width: 300px; min-width: 299px" class="walktrgh_content">
+                <p id="Raya Lucaria Academy wlk"> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>            </div>
+            <div style="text-align: left; overflow-y: auto;box-sizing: border-box; max-width: 300px; min-width: 299px" class="walktrgh_content">
+                <p id="Liurnia of the Lakes East wlk"> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>            </div>
+            <div style="text-align: left; overflow-y: auto;box-sizing: border-box; max-width: 300px; min-width: 299px" class="walktrgh_content">
+                <p id="Ainsel River wlk"> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>            </div>
+            <div style="text-align: left; overflow-y: auto;box-sizing: border-box; max-width: 300px; min-width: 299px" class="walktrgh_content">
+                <p id="Liurnia of the Lakes West wlk"> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>            </div>
+            <div style="text-align: left; overflow-y: auto;box-sizing: border-box; max-width: 300px; min-width: 299px" class="walktrgh_content">
+                <p id="Siofra River wlk">
+                   Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+            </div>
+            <div style="text-align: left; overflow-y: auto;box-sizing: border-box; max-width: 300px; min-width: 299px" class="walktrgh_content">
+                <p id="Caelid wlk">
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+            </div>
+            <div style="text-align: left; overflow-y: auto;box-sizing: border-box; max-width: 300px; min-width: 299px" class="walktrgh_content">
+                <p id="Nokron, Eternal City & Siofra Aqueduct wlk">
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+            </div>
+            <div style="text-align: left; overflow-y: auto;box-sizing: border-box; max-width: 300px; min-width: 299px" class="walktrgh_content">
+                <p id="Liurnia of the Lakes West wlk">
+                   Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+            </div>
+            <div style="text-align: left; overflow-y: auto;box-sizing: border-box; max-width: 300px; min-width: 299px" class="walktrgh_content">
+                <p id="Deeproot Depths wlk"> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>            </div>
+            <div style="text-align: left; overflow-y: auto;box-sizing: border-box; max-width: 300px; min-width: 299px" class="walktrgh_content">
+                <p id="Nokstella, Eternal City & Lake of Rot wlk"> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>            </div>
+            <div style="text-align: left; overflow-y: auto;box-sizing: border-box; max-width: 300px; min-width: 299px" class="walktrgh_content">
+                <p id="Altus Plateau wlk"> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+            </div>
+            <div style="text-align: left; overflow-y: auto;box-sizing: border-box; max-width: 300px; min-width: 299px" class="walktrgh_content">
+                <p id="Mt Gelmir wlk"> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>            </div>
+            <div style="text-align: left; overflow-y: auto;box-sizing: border-box; max-width: 300px; min-width: 299px" class="walktrgh_content">
+            <p id="Leyndell, Royal Capital Outskirts wlk"> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+            </div>
+            <div style="text-align: left; overflow-y: auto;box-sizing: border-box; max-width: 300px; min-width: 299px" class="walktrgh_content">
+            <p id="Forbidden Lands wlk">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+            </div>
+            <div style="text-align: left; overflow-y: auto;box-sizing: border-box; max-width: 300px; min-width: 299px" class="walktrgh_content">
+              <p id="Mountaintops of the Giants wlk"> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>            </div>
+            <div style="text-align: left; overflow-y: auto;box-sizing: border-box; max-width: 300px; min-width: 299px" class="walktrgh_content">
+            <p id="Consecrated Snowfield wlk"> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>            </p>
+            </div>
+            <div style="text-align: left; overflow-y: auto;box-sizing: border-box; max-width: 300px; min-width: 299px" class="walktrgh_content">
+            <p id="Mohgwyn Palace wlk"> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>            </div>
+            <div style="text-align: left; overflow-y: auto;box-sizing: border-box; max-width: 300px; min-width: 299px" class="walktrgh_content">
+            <p id="Miquellas Haligtree wlk"> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>            </div>
+            <div style="text-align: left; overflow-y: auto;box-sizing: border-box; max-width: 300px; min-width: 299px" class="walktrgh_content">
+            <p id="Crumbling Farum Azula wlk">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+            </div>
+            <div style="text-align: left; overflow-y: auto;box-sizing: border-box; max-width: 300px; min-width: 299px" class="walktrgh_content">
+            <p id="Leyndell, Ashen Capital wlk">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+            </div>
+            <div style="text-align: left; overflow-y: auto;box-sizing: border-box; max-width: 300px; min-width: 299px" class="walktrgh_content">
+            <p id="Subterranean Shunning-Grounds wlk">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+            </div>
+            <div style="text-align: left; overflow-y: auto;box-sizing: border-box; max-width: 300px; min-width: 299px" class="walktrgh_content">
+            <p id="Endings wlk"> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>            
+            </div>
+        </div>
+        <!-- Main Frame -->
+        <div style="text-align: left;" class="mainpanel active" id="West Limgrave">
+            <h2 style="text-align: center;" class="regiontit" id="regionTitle">West Limgrave</h2>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+        </div>
+        <div style="text-align: left;" class="mainpanel" id="East Limgrave">
+            <h2 style="text-align: center;" class="regiontit" id="regionTitle">East Limgrave</h2>
+            
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            
+        </div>
+        <div style="text-align: left;" class="mainpanel" id="Southern Limgrave & Weeping Peninsula">
+            <h2 style="text-align: center;" class="regiontit" id="regionTitle">Southern Limgrave & Weeping Peninsula</h2>
+            
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            
+        </div>
+        <div style="text-align: left;" class="mainpanel" id="Roundtable Hold">
+            <h2 style="text-align: center;" class="regiontit" id="regionTitle">Roundtable Hold</h2>
+            
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+        </div>
+        <div style="text-align: left;" class="mainpanel" id="Stormveil Castle">
+            <h2 style="text-align: center;" class="regiontit" id="regionTitle">Stormveil Castle</h2>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>            
+        </div>
+        <div style="text-align: left;" class="mainpanel" id="Liurnia of the Lakes South">
+            <h2 style="text-align: center;" class="regiontit" id="regionTitle">Liurnia of the Lakes South</h2>
+            
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>            
+        </div>
+        <div style="text-align: left;" class="mainpanel" id="Raya Lucaria Academy">
+            <h2 style="text-align: center;" class="regiontit" id="regionTitle">Raya Lucaria Academy</h2>
+            
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>            
+        </div>
+        <div style="text-align: left;" class="mainpanel" id="Liurnia of the Lakes East">
+            <h2 style="text-align: center;" class="regiontit" id="regionTitle">Liurnia of the Lakes East</h2>
+            
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>            
+        </div>
+        <div style="text-align: left;" class="mainpanel" id="Ainsel River">
+            <h2 style="text-align: center;" class="regiontit" id="regionTitle">Ainsel River (Underground)</h2>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>            
+        </div>
+        <div style="text-align: left;" class="mainpanel" id="Liurnia of the Lakes West">
+            <h2 style="text-align: center;" class="regiontit" id="regionTitle">Liurnia of the Lakes West</h2>
+            
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>            
+            
+        </div>
+        <div style="text-align: left;" class="mainpanel" id="Siofra River">
+            <h2 style="text-align: center;" class="regiontit" id="regionTitle">Siofra River (Underground)</h2>
+            
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>            
+            
+        </div>
+        <div style="text-align: left;" class="mainpanel" id="Caelid">
+            <h2 style="text-align: center;" class="regiontit" id="regionTitle">Caelid (South)</h2>
+            
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>            
+            
+        </div>
+        <div style="text-align: left;" class="mainpanel" id="Nokron, Eternal City & Siofra Aqueduct">
+            <h2 style="text-align: center;" class="regiontit" id="regionTitle">Nokron, Eternal City & Siofra Aqueduct</h2>
+            
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>            
+            
+        </div>
+        <div style="text-align: left;" class="mainpanel" id="Liurnia of the Lakes West-2">
+            <h2 style="text-align: center;" class="regiontit" id="regionTitle">Liurnia of the Lakes West</h2>
+            
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>            
+            
+        </div>
+        <div style="text-align: left;" class="mainpanel" id="Deeproot Depths">
+            <h2 style="text-align: center;" class="regiontit" id="regionTitle">Deeproot Depths</h2>
+            
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>            
+            
+        </div>
+        <div style="text-align: left;" class="mainpanel" id="Nokstella, Eternal City & Lake of Rot">
+            <h2 style="text-align: center;" class="regiontit" id="regionTitle">Nokstella, Eternal City & Lake of Rot</h2>
+            
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>            
+            
+        </div>
+        <div style="text-align: left;" class="mainpanel" id="Altus Plateau">
+            <h2 style="text-align: center;" class="regiontit" id="regionTitle">Altus Plateau</h2>
+            
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>            
+            
+        </div>
+        <div style="text-align: left;" class="mainpanel" id="Mt Gelmir">
+            <h2 style="text-align: center;" class="regiontit" id="regionTitle">Mt Gelmir</h2>
+            
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>            
+            
+        </div>
+        <div style="text-align: left;" class="mainpanel" id="Leyndell, Royal Capital Outskirts">
+            <h2 style="text-align: center;" class="regiontit" id="regionTitle">Leyndell, Royal Capital Outskirts</h2>
+            
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>            
+            
+        </div>
+        <div style="text-align: left;" class="mainpanel" id="Forbidden Lands">
+            <h2 style="text-align: center;" class="regiontit" id="regionTitle">Forbidden Lands</h2>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>            
+            
+        </div>
+        <div style="text-align: left;" class="mainpanel" id="Mountaintops of the Giants">
+            <h2 style="text-align: center;" class="regiontit" id="regionTitle">Mountaintops of the Giants</h2>
+            
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>            
+            
+        </div>
+        <div style="text-align: left;" class="mainpanel" id="Consecrated Snowfield">
+            <h2 style="text-align: center;" class="regiontit" id="regionTitle">Consecrated Snowfield</h2>
+            
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>            
+            
+        </div>
+        <div style="text-align: left;" class="mainpanel" id="Mohgwyn Palace">
+            <h2 style="text-align: center;" class="regiontit" id="regionTitle">Mohgwyn Palace</h2>
+            
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>            
+            
+        </div>
+        <div style="text-align: left;" class="mainpanel" id="Miquellas Haligtree">
+            <h2 style="text-align: center;" class="regiontit" id="regionTitle">Miquella's Haligtree</h2>
+            
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>            
+            
+        </div>
+        <div style="text-align: left;" class="mainpanel" id="Crumbling Farum Azula">
+            <h2 style="text-align: center;" class="regiontit" id="regionTitle">Crumbling Farum Azula</h2>
+            
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>            
+            
+        </div>
+        <div style="text-align: left;" class="mainpanel" id="Leyndell, Ashen Capital">
+            <h2 style="text-align: center;" class="regiontit" id="regionTitle">Leyndell, Ashen Capital</h2>
+            
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>            
+            
+        </div>
+        <div style="text-align: left;" class="mainpanel" id="Subterranean Shunning-Grounds">
+            <h2 style="text-align: center;" class="regiontit" id="regionTitle">Subterranean Shunning-Grounds</h2>
+            
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>            
+            
+        </div>
+        <div style="text-align: left;" class="mainpanel" id="Endings">
+            <h2 style="text-align: center;" class="regiontit" id="regionTitle">Endings</h2>
+            
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>
+            <label class="elden_check">
+                <input type="checkbox"> <span>Lorem ipsum dolor sit amet</span>
+            </label>            
+            
+        </div>
+    </div>
+<!--API Settings-->
+    <div  style=" position: relative;" class="screen" id="apisettings">
+        <div onclick="openwin('apisumm'); window.pywebview.api.apiset_disp();" class="info-btn">i</div>
+        <label> Select a Provider:</label>
+        <select onchange="provider_choose()" class="elden-input" id="provider">
+                <option value=""> --- </option>
+                <option >OpenAI</option>
+                <option >Anthropic</option>
+                <option >Google</option>
+        </select>
+
+        <input onchange="model_choose()" style="display: none; animation: fadeIn 0.9s ease-out;" class="elden-input"  id="apimodel" placeholder="Provide the model name">
+                
+        </select>  
+        <label>Insert an API key:</label>
+        <div style="display: flex; flex-direction: row; gap: 3px;">
+            <input class="elden-input" type="password" id="apikey" placeholder="Enter an API key">
+            <button onclick="send_key()">➜</button>
+        </div>
+        <select onchange="send_tone()" class="elden-input" id="tonelist" style="display: block; animation: fadeIn 0.9s ease-out;">
+                <option value=""> Select Tone </option>
+                <option >Remembrancer</option>
+                <option >Scion of Grace</option>
+                <option >Grace-Abandoned</option>
+        </select>
+        <div style="display: flex; flex-direction: row; gap: 200px;">
+            <button onclick="go('menu')">Back</button>
+            <button onclick="save()">Save</button>
+        </div>
+
+        <div class="app_window hidden" id="apisumm"> 
+            <div style="text-align: right;" class="window_header"> 
+                <button class="lbutton" onclick="closewin('apisumm');"> — </button>
+            </div>
+            <div id="apisetsum"> </div>
+
+        </div>
+    </div>
+    
+<!--Options-->  
+    <div class="screen" id="options">
+        <div onclick="openwin('optsumm');window.pywebview.api.set_disp();" class="info-btn">i</div>
+        <label for="buildinput2">Choose a build to follow:</label>
+            <input
+                onclick="act_bld2()"
+                onchange="send_build2()"
+                class="elden-input"
+                id="buildinput2"
+                list="buildoptions2"
+                placeholder="Start typing a build name"
+                autocomplete="off"
+            />
+        <datalist id="buildoptions2"></datalist>
+
+        <label for="choice">Choose walktrough display setting:</label>
+            <select onchange="walktrgh2()" class="elden-input" id="helpchoice2">
+                <option value="">-- Select --</option>
+                <option >Minimalist</option>
+                <option >Full Walktrough</option>
+            </select>
+        <div style="display: flex; flex-direction: row; gap: 200px;">
+            <button onclick="go('menu')">Back</button>
+            <button onclick="save()">Save Changes</button>
+        </div>
+
+        <div class="app_window hidden" id="optsumm"> 
+
+            <div style="text-align: right;" class="window_header"> 
+                <button class="lbutton" onclick="closewin('optsumm')"> — </button>
+            </div>
+            <div id="setsum"> </div>
+        </div>
+    </div>
+    
+
+
+    <script src="ui.js"></script>
+</body>
+</html>
