@@ -1,0 +1,5 @@
+pywebview
+langchain-google-genai
+langchain-core
+openai
+anthropic
